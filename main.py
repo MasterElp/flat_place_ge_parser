@@ -20,6 +20,7 @@ headers = {
     'cache-control': 'max-age=0',
     # 'cookie': 'PLACEGE=826t94aj92sg17mb0828ikq0g6; plc[lang]=Q2FrZQ%3D%3D.NKw%3D; _ga=GA1.1.1628457313.1709207010; plc[fb_popup_shown]=Q2FrZQ%3D%3D.dw%3D%3D; plc[mode]=Q2FrZQ%3D%3D.KrDcFg%3D%3D; _ga_B8GK75F5FJ=GS1.1.1709801325.9.0.1709801325.60.0.0',
     'dnt': '1',
+    #'referer': 'https://place.ge/ru/ads?object_type=flat&mode=list&nearest=0&type=for_rent&condition=&project=&agency_id=&city_id=1&region_id=&district_id=&street_id=&commercial_type=&commercial_type2=&status=&rooms_from=2&rooms_to=2&living_space_from=40&living_space_to=%D0%B4%D0%BE&price_from=%D0%BE%D1%82&price_to=1500&currency_id=1&with_photos=0&owner=0&owner=1',
     'sec-ch-ua': '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
     'sec-ch-ua-mobile': '?0',
     'sec-ch-ua-platform': '"Windows"',
@@ -32,32 +33,18 @@ headers = {
 }
 
 params = {
-    'object_type': 'flat',
-    'mode': 'list',
-    'nearest': '0',
     'type': 'for_rent',
-    'condition': '',
-    'project': '',
-    'agency_id': '',
-    'city_id': '1',
-    'region_id': '',
-    'district_id': '',
-    'street_id': '',
-    'commercial_type': '',
-    'commercial_type2': '',
-    'status': '',
+    'object_type': 'flat',
     'rooms_from': '2',
     'rooms_to': '2',
-    'living_space_from': '40',
-    'living_space_to': 'до',
-    'price_from': 'от',
     'price_to': '1500',
     'currency_id': '1',
-    'with_photos': '0',
-    'owner': [
-        '0',
-        '1',
-    ],
+    'living_space_from': '40',
+    'city_id': '1',
+    'owner': '1',
+    'mode': 'list',
+    'order_by': 'date',
+    'limit': '100',
 }
 
 response = requests.get('https://place.ge/ru/ads', params=params, cookies=cookies, headers=headers)

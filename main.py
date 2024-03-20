@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 from urllib.parse import parse_qs, urlparse
 import sys
+import pandas as pd
 
 # https://curlconverter.com/ copy as curl(bash)
 cookies = {
@@ -47,20 +48,54 @@ params = {
     'limit': '100',
 }
 
-response = requests.get('https://place.ge/ru/ads', params=params, cookies=cookies, headers=headers)
-if response.status_code != 200:
-    print (f"Сайт вернул код: {response.status_code}")
-    sys. exit()
+class Apartment:
+    price = 0
+    area = 0
+    rooms = 0
+    floor = 0
+    max_floor = 0
+    district = ""
+    neighborhood = ""
+    address = ""
+    tel = ""
+    #price per square meter
 
-soup = BeautifulSoup(response.text, 'html.parser')
+def main():
+    response = requests.get('https://place.ge/ru/ads', params=params, cookies=cookies, headers=headers)
+    if response.status_code != 200:
+        print (f"Сайт вернул код: {response.status_code}")
+        sys. exit()
 
-#left > div.leftSite > div.recommended > div.boxProdFilter > div.tr-line.paid-ad > div.photo-info > div.infoFilter
-table = soup.find('div', {'class': 'boxProdFilter'})
-infos = []
-#print(table)
-for row in table.find_all('div', {'class': 'tr-line'})[1:]:
-    #print(row)
-    info = row.find('div', {'class': 'infoFilter'}).text.strip()
-    infos.append(info)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    #df = pd.DataFrame(columns=['price', 'area', 'rooms'])
 
-print(infos)
+    #left > div.leftSite > div.recommended > div.boxProdFilter > div.tr-line.paid-ad > div.photo-info > div.infoFilter
+    table = soup.find('div', {'class': 'boxProdFilter'})
+    infos = []
+    apartments = []
+
+    for row in table.find_all('div', {'class': 'tr-line'})[1:]:
+
+        info = row.find('div', {'class': 'infoFilter'})
+        infos.append(info.text.strip())
+
+        price = info.find('span', {'class': 'price'}).text.strip()
+        #print(price)
+        apartment = Apartment()
+        apartment.price = 0
+        apartment.area = 0
+        apartment.rooms = 0
+        apartment.floor = 0
+        apartment.max_floor = 0
+        apartment.district = price
+        apartment.neighborhood = ""
+        apartment.address = ""
+        apartment.tel = ""
+
+        apartments.append(apartment)
+
+    df = pd.DataFrame([vars(ap) for ap in apartments])
+    print(df)
+
+if (__name__ == "__main__"):
+    main()

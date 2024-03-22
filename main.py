@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import parse_qs, urlparse
 import sys
 import pandas as pd
+import re
 
 # https://curlconverter.com/ copy as curl(bash)
 cookies = {
@@ -49,6 +50,8 @@ params = {
 }
 
 class Apartment:
+    id = 0
+    date = ""
     price = 0
     area = 0
     rooms = 0
@@ -71,17 +74,25 @@ def main():
 
     #left > div.leftSite > div.recommended > div.boxProdFilter > div.tr-line.paid-ad > div.photo-info > div.infoFilter
     table = soup.find('div', {'class': 'boxProdFilter'})
-    infos = []
     apartments = []
 
     for row in table.find_all('div', {'class': 'tr-line'})[1:]:
+        info_filter = row.find('div', {'class': 'infoFilter'})
+        edit_filter = row.find('div', {'class': 'editFilter'})
 
-        info = row.find('div', {'class': 'infoFilter'})
-        infos.append(info.text.strip())
+        #"ID: 1276813"
+        id = 0
+        result = re.search(r'ID:\s?(\d+)', edit_filter.text.strip())
+        if (result):
+            id = result.group(1)
+            print (id)
 
-        price = info.find('span', {'class': 'price'}).text.strip()
+        price = info_filter.find('span', {'class': 'price'}).text.strip()
         #print(price)
+
         apartment = Apartment()
+        apartment.id = id
+        apartment.date = ""
         apartment.price = 0
         apartment.area = 0
         apartment.rooms = 0

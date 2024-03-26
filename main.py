@@ -81,32 +81,56 @@ def main():
         edit_filter = row.find('div', {'class': 'editFilter'})
 
         #"ID: 1276813"
-        id = 0
-        result = re.search(r'ID:\s?(\d+)', edit_filter.text.strip())
-        if (result):
-            id = result.group(1)
-            print (id)
+        id = search_field(r'ID:\s?(\d+)', edit_filter.text.strip(), 0)
+        
+        #<em>добавлено: </em>
+        date = search_field(r'(\d+.\d+.\d+)', edit_filter.find('span', {'class': 'pub-date'}).text.strip(), "")
 
-        price = info_filter.find('span', {'class': 'price'}).text.strip()
-        #print(price)
+        #<strong>5,000 лари / месяц</strong>
+        price_thousand = search_field(r'(\d+),\d+ лари / месяц', info_filter.find('span', {'class': 'price'}).text.strip(), 0)
+        price_rest = search_field(r'(\d+) лари / месяц', info_filter.find('span', {'class': 'price'}).text.strip(), 0)
+        try:
+            price = int(price_thousand)*1000 + int(price_rest)
+        except:
+            print("price = int({price_thousand})*1000 + int({price_rest})")
+            price = 0
+        
+        #, квартира, 4 комнаты, 118 м кв., этаж 3/10
+        area = search_field(r'(\d+) м кв.', info_filter.text.strip(), 0)
+        rooms = search_field(r'(\d+) комнат', info_filter.text.strip(), 0)
+        floor = search_field(r'этаж (\d+)', info_filter.text.strip(), 0)
+        max_floor = search_field(r'этаж \d+/(\d+)', info_filter.text.strip(), 0)
+        # Тбилиси, Сабуртало, пр. Важа-Пшавела
+        district = search_field(r'Тбилиси, (\w+),', info_filter.text.strip(), "")
+        address = search_field(r'Тбилиси, \w+, (\w+),', info_filter.text.strip(), "")
+        #тел: 5-97-799292, Ia, агент 
+        tel = search_field(r'тел: ([0-9-]+)', info_filter.text.strip(), "")
 
         apartment = Apartment()
         apartment.id = id
-        apartment.date = ""
-        apartment.price = 0
-        apartment.area = 0
-        apartment.rooms = 0
-        apartment.floor = 0
-        apartment.max_floor = 0
-        apartment.district = price
+        apartment.date = date
+        apartment.price = price
+        apartment.area = area
+        apartment.rooms = rooms
+        apartment.floor = floor
+        apartment.max_floor = max_floor
+        apartment.district = district
         apartment.neighborhood = ""
-        apartment.address = ""
-        apartment.tel = ""
+        apartment.address = address
+        apartment.tel = tel
 
         apartments.append(apartment)
 
     df = pd.DataFrame([vars(ap) for ap in apartments])
     print(df)
 
+def search_field(regular, text, default_value):
+    value = default_value
+    result = re.search(regular, text)
+    if (result):
+        value = result.group(1)
+
+    return value
+    
 if (__name__ == "__main__"):
     main()
